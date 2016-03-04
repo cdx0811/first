@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/">
+        <file>image/123.png</file>
+        <file>image/connect.png</file>
+        <file>image/icon.png</file>
+        <file>image/rain.jpg</file>
+        <file>image/restart.png</file>
+        <file>image/shutdown.png</file>
+        <file>image/断开连接.png</file>
+        <file>image/二维码.png</file>
+        <file>image/桌面.png</file>
+        <file>image/最大最小.jpg</file>
+        <file>image/login.png</file>
+    </qresource>
+</RCC>
