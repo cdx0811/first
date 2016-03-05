@@ -21,17 +21,17 @@ class login : public QDialog
 public:
     explicit login(QWidget *parent = 0);
     ~login();
-    QString getName(){return userName;}
-    inline int getScreenWeight(){return screenWeight;}
-    inline int getScreenHeight(){return screenHeight;}
-    inline QSize getScreenSize(){return screenSize;}
+    QString getName(){return mUserName;}
+    inline int getScreenWeight(){return mScreenWeight;}
+    inline int getScreenHeight(){return mScreenHeight;}
+    inline QSize getScreenSize(){return mScreenSize;}
 
 
 private Q_SLOTS:
 
-    void on_PushButton_Ok_Clicked();
-    void on_PushButton_Cancel_Clicked();
-    void on_PushButton_Qrcode_clicked();
+    void on_pushButton_ok_clicked();
+    void on_pushButton_cancel_clicked();
+    void on_pushButton_erweima_clicked();
     void sendSearchSignals();
 
 Q_SIGNALS:
@@ -39,15 +39,15 @@ Q_SIGNALS:
 
 private:
     Ui::login *ui;
-    sqlite* sql;
-    int key;
-    QString userName;
-    int screenWeight;
-    int screenHeight;
-    QSize screenSize;
+    sqlite* mSql;
+    int mKey;
+    QString mUserName;
+    int mScreenWeight;
+    int mScreenHeight;
+    QSize mScreenSize;
 
 #ifdef Q_OS_WIN
-    QrcodeGenerate* code;
+    QrcodeGenerate* mCode;
 #endif
 };
 

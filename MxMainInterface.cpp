@@ -12,6 +12,7 @@
 #include <QRadioButton>
 #include "MxRemoteIp.h"
 #include <QPushButton>
+#include <QTimer>
 
 
 Widget::Widget(QWidget *parent) :
@@ -29,7 +30,7 @@ Widget::~Widget()
 void Widget::init()//初始化
 {
     login loginDialog(this);
-    socket=new QTcpSocket(this);
+    mSocket=new QTcpSocket(this);
 
     //------------------主界面背景--------------------
     QPalette pal;
@@ -43,12 +44,13 @@ void Widget::init()//初始化
     setPalette(pal);
     //----------------------------------------------
 
-    if(loginDialog.exec() == QDialog::Accepted){
-        qDebug()<<"quit";
+    if(loginDialog.exec() == QDialog::Accepted)
+    {
+
     }
     else
     {
-        this->close();
+        QTimer::singleShot(0,qApp,SLOT(quit()));
     }
 
     ui->pushButton_talk->setEnabled(false);
@@ -57,34 +59,30 @@ void Widget::init()//初始化
     ui->pushButton_IE->setEnabled(false);
     ui->pushButton_disconnect->hide();
 
-    connect(socket,&QTcpSocket::readyRead,this,&Widget::readData);
-    //connect(socket,&QTcpSocket::disconnected,this,&Widget::disconnectmessage);
-
+    connect(mSocket,&QTcpSocket::readyRead,this,&Widget::readData);
 }
 void Widget::readData()//读取信息
 {
-    QByteArray receiveQb=socket->readAll();
+    QByteArray receiveQb=mSocket->readAll();
     QDataStream dataStream(&receiveQb,QIODevice::ReadOnly);
     int type;
     dataStream>>type;
 
 }
 
-void Widget::on_PushButton_Restart_Clicked() //重启按钮
+void Widget::on_pushButton_restart_clicked() //重启按钮
 {
     QMessageBox::information(this,"infor","restart information has been seed");
     writeMessage(CP_ServerVci);
 }
 
-void Widget::on_PushButton_Connect_Clicked()//连接 按钮
+void Widget::on_pushButton_connect_clicked()//连接 按钮
 {
-    cDialog = new CNetDlg(this);
-    connect(cDialog,&CNetDlg::sendIp,this,&Widget::myConnectToHost);
-    cDialog->open();
-    //cdialog->exec();
+    mDialog = new CNetDlg(this);
+    connect(mDialog,&CNetDlg::sendIp,this,&Widget::myConnectToHost);
+    mDialog->exec();
 }
-
-void Widget::on_PushButton_Disconnect_Clicked()//断开连接
+void Widget::on_pushButton_disconnect_clicked()//断开连接
 {
     disconnectFromRemote();
 }
@@ -95,7 +93,7 @@ void Widget::writeMessage(int type,QString str)//发送信息
     QByteArray message;
     QDataStream data(&message,QIODevice::WriteOnly);
     data<<type<<str;
-    socket->write(message);
+    mSocket->write(message);
 }
 void Widget::myConnectToHost(QString str)//连接到host
 {
@@ -103,14 +101,14 @@ void Widget::myConnectToHost(QString str)//连接到host
     qDebug()<<"in connecttohost";
     if(!str.isEmpty())
     {
-        socket->connectToHost(str,55128);
-        connect(socket,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(qAbstractError(QAbstractSocket::SocketError)));
-        connect(socket,&QTcpSocket::connected, this,&Widget::whenConnected);
-        qDebug()<<socket->error();
+        mSocket->connectToHost(str,55128);
+        connect(mSocket,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(qAbstractError(QAbstractSocket::SocketError)));
+        connect(mSocket,&QTcpSocket::connected, this,&Widget::whenConnected);
+        qDebug()<<mSocket->error();
     }
     else
     {
-        QMessageBox::critical(cDialog,"errror","cann't be empty");
+        QMessageBox::critical(mDialog,"errror","cann't be empty");
     }
 
 }
@@ -124,8 +122,8 @@ void Widget::qAbstractError(QAbstractSocket::SocketError error)//错误信息
 
 void Widget::whenConnected()//connecttohost成功后
 {
-    cDialog->hide();
-    ui->label_information->setText(tr("connecting %1").arg(socket->peerAddress().toString()));
+    mDialog->hide();
+    ui->label_information->setText(tr("connecting %1").arg(mSocket->peerAddress().toString()));
     ui->pushButton_talk->setEnabled(true);
     ui->pushButton_restart->setEnabled(true);
     ui->pushButton_xz->setEnabled(true);
@@ -137,22 +135,16 @@ void Widget::whenConnected()//connecttohost成功后
     ui->pushButton_disconnect->setEnabled(true);
 }
 
-void Widget::on_PushButton_Clicked()
-{
-
-
-}
-
 void Widget::Login()
 {
-    loginDialog->close();
-    ui->label_name->setText(loginDialog->getName());
+    mLoginDialog->close();
+    ui->label_name->setText(mLoginDialog->getName());
 
 }
 
 void Widget::disconnectFromRemote() // 连接断开后
 {
-    socket->disconnectFromHost();
+    mSocket->disconnectFromHost();
     ui->pushButton_talk->setEnabled(false);
     ui->pushButton_connect->show();
     ui->pushButton_connect->setEnabled(true);
@@ -164,10 +156,10 @@ void Widget::disconnectFromRemote() // 连接断开后
     ui->pushButton_restart->setEnabled(false);
 }
 
-void Widget::on_PushButton_IE_Clicked()
+void Widget::on_pushButton_IE_clicked()
 {    
 
-    int i=(times++)%2;
+    int i=(Times++)%2;
 
     writeMessage(CP_OpenCloseExplorer,QString::number(i));
     qDebug()<<"i"<<i;
@@ -182,13 +174,13 @@ void Widget::on_PushButton_IE_Clicked()
 
 }
 
-void Widget::on_pushButton_DisplaySetting_clicked()//分辨率和旋转
+void Widget::on_pushButton_xz_clicked()//分辨率和旋转
 {
     QDialog* dia=new QDialog(this);
-    checkbox=new QCheckBox(dia);
-    checkbox->setText("shuping");
+    mCheckBox=new QCheckBox(dia);
+    mCheckBox->setText("shuping");
     QVBoxLayout* hbl=new QVBoxLayout(dia);
-    hbl->addWidget(checkbox);
+    hbl->addWidget(mCheckBox);
     QPushButton* button=new QPushButton("setfenbianlv",dia);
     hbl->addWidget(button);
     dia->setLayout(hbl);
@@ -196,7 +188,7 @@ void Widget::on_pushButton_DisplaySetting_clicked()//分辨率和旋转
 
     connect(button,&QPushButton::clicked,[=](){
         int i=0;
-        if(checkbox->isChecked())
+        if(mCheckBox->isChecked())
         {
             i=1;
         }
@@ -205,10 +197,10 @@ void Widget::on_pushButton_DisplaySetting_clicked()//分辨率和旋转
 	});
 }
 
-void Widget::on_pushButton_WindowState_clicked() //远程状态设置按钮
+void Widget::on_pushButton_talk_clicked() //远程状态设置按钮
 {
-    WindowStateDialog=new QDialog(this);
-    WindowStateDialog->setFixedSize(300,200);
+    mWindowStateDialog=new QDialog(this);
+    mWindowStateDialog->setFixedSize(300,200);
     QLabel* label_mini=new QLabel("minimize");
     QRadioButton* mini=new QRadioButton;
 
@@ -236,34 +228,29 @@ void Widget::on_pushButton_WindowState_clicked() //远程状态设置按钮
     QVBoxLayout* vbl=new QVBoxLayout;
     vbl->addLayout(all);
     vbl->addWidget(ok);
-    WindowStateDialog->setLayout(vbl);
-    WindowStateDialog->show();
+    mWindowStateDialog->setLayout(vbl);
+    mWindowStateDialog->show();
     connect(ok,SIGNAL(clicked(bool)),this,SLOT(slot_btnRadio()));
     connect(ok,&QPushButton::clicked,[=]()
     {
         if (mini->isChecked())
         {
-            state = QString("MINI");
+            mState = QString("MINI");
         }
         else if (max->isChecked())
         {
-            state = QString("MAX");
+            mState = QString("MAX");
         }
         else
         {
-            state = QString("FULL");
+            mState = QString("FULL");
         }
-        qDebug()<<state;
-        writeMessage(CP_SetWindowState,state);
-        WindowStateDialog->close();
+        qDebug()<<mState;
+        writeMessage(CP_SetWindowState,mState);
+        mWindowStateDialog->close();
     });
 }
-void Widget::radio_change()
-{
-
-}
-
-void Widget::CloseThis()
+void Widget::closeWidget()
 {
     qDebug()<<"Close Widget";
     //Q_EMIT closeEXE();

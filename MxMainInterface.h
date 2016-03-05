@@ -55,64 +55,46 @@ public:
         CP_LiveUpdate=24,
         //关机
         CP_ServerVci,
-
-
     };
 
 private Q_SLOTS:
     void readData();
-    void on_PushButton_Restart_Clicked();
-    void on_PushButton_Connect_Clicked();
-    void on_PushButton_Disconnect_Clicked();
+
     void writeMessage(int type,QString str="");
     void myConnectToHost(QString str);
     void qAbstractError(QAbstractSocket::SocketError error);
     void whenConnected();
-    void on_PushButton_Clicked();
-   // void CheckingQrcode(int num);
     void Login();
     void disconnectFromRemote();
-    void on_PushButton_IE_Clicked();
 
-    void on_pushButton_DisplaySetting_clicked();
-
-    void on_pushButton_WindowState_clicked();
-    void radio_change();
-    void CloseThis();
-    //void slot_btnRadio();
+    void on_pushButton_restart_clicked();
+    void on_pushButton_connect_clicked();
+    void on_pushButton_disconnect_clicked();
+    void on_pushButton_IE_clicked();
+    void on_pushButton_xz_clicked();
+    void on_pushButton_talk_clicked();
+    void closeWidget();
 Q_SIGNALS:
-    void shownewmessage(QString str);
-    void ReturnLoginInfor(QString& str);
+    void shownewMessage(QString str);
+    void returnLoginInfo(QString& str);
     void closeEXE();
+
 private:
-    int times;
+    int Times;
     Ui::Widget *ui;
-    QTcpSocket* socket;
-    QString infor;
-    QString state;
-    QCheckBox* checkbox;
-    QComboBox* combobox;
+    QTcpSocket* mSocket;
+    QString mInfo;
+    QString mState;
+    QCheckBox* mCheckBox;
+    CNetDlg* mDialog; //ip地址连接对话框
+    QDialog* mWindowStateDialog;//状态设置对话框，最大最小化
+    login* mLoginDialog; //登录对话框
+    QByteArray mSendqb;
 
-    QHBoxLayout* hbl;
-    QVBoxLayout* vbl;
-    QImage image;
-    QLineEdit* text;
-    QLineEdit* linee;
-    QLabel* start;
-
-    CNetDlg* cDialog; //ip地址连接对话框
-    QDialog* WindowStateDialog;//状态设置对话框，最大最小化
-    login* loginDialog; //登录对话框
 private:
     void init();
     void listening();
-    void getpending();
-    void send();
-
-    QByteArray sendqb;
-    //    QByteArray receiveqb;
-
-
+    void getPending();
 };
 
 #endif // WIDGET_H

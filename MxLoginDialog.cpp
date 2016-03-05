@@ -21,22 +21,22 @@ login::login(QWidget *parent) :
     ui->setupUi(this);
 //    setWindowFlags(windowFlags()&~Qt::WindowCloseButtonHint&~Qt::WindowContextHelpButtonHint&~Qt::WindowTitleHint);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-    screenWeight=QApplication::desktop()->width();
-    screenHeight=QApplication::desktop()->height();
-    screenSize=QSize(screenWeight,screenHeight);
+    mScreenWeight=QApplication::desktop()->width();
+    mScreenHeight=QApplication::desktop()->height();
+    mScreenSize=QSize(mScreenWeight,mScreenHeight);
 
     ui->lineEdit_username->setFocus();
 #ifdef Q_OS_WIN
-    code=new QrcodeGenerate(this);
+    mCode=new QrcodeGenerate(this);
     QHBoxLayout* hbl=new QHBoxLayout(this);
     hbl->addLayout(ui->verticalLayout);
-    hbl->addWidget(code);
+    hbl->addWidget(mCode);
     this->setLayout(hbl);
-    code->setGeometry(250,0,150,150);
-    code->setFixedSize(150,150);
-    code->setVisible(false);
-    code->hide();
-    this->resize(250,150);
+    mCode->setGeometry(250,0,150,150);
+    mCode->setFixedSize(150,150);
+    mCode->setVisible(false);
+    mCode->hide();
+    this->resize(500,300);
 #else
     ui->pushButton_ok->setMinimumHeight(100);
     ui->pushButton_cancel->setMinimumHeight(100);
@@ -45,7 +45,7 @@ login::login(QWidget *parent) :
 
 #endif
 
-    sql=sqlite::GetInstance();
+    mSql=sqlite::getInstance();
 }
 
 login::~login()
@@ -55,13 +55,13 @@ login::~login()
 }
 
 
-void login::on_PushButton_Ok_Clicked() //确定按钮
+void login::on_pushButton_ok_clicked() //确定按钮
 {
     QString username=ui->lineEdit_username->text();
     QString password=ui->lineEdit_password->text();
     if(!username.isEmpty()&&!password.isEmpty())
     {
-        if(sql->checkingUP(this,username,password))
+        if(mSql->checkingUP(this,username,password))
         {
             this->accept();
         }
@@ -70,37 +70,35 @@ void login::on_PushButton_Ok_Clicked() //确定按钮
     {
         QMessageBox::critical(this,"error","cann't be empty");
     }
-    this->reject();
-    return;
 }
 
-void login::on_PushButton_Cancel_Clicked() //取消按钮
+void login::on_pushButton_cancel_clicked() //取消按钮
 {
     this->reject();
 }
 
-void login::on_PushButton_Qrcode_clicked()//二维码按钮
+void login::on_pushButton_erweima_clicked()//二维码按钮
 {
 #ifdef Q_OS_WIN
-    if(code->isVisible())
+    if(mCode->isVisible())
     {
         qDebug()<<"setunvisible";
-        code->hide();
-        code->setVisible(false);
-        this->resize(250,150);
+        mCode->hide();
+        mCode->setVisible(false);
+        //this->resize(250,150);
     }
     else
     {
         qDebug()<<"setvisible";
         //code->update();//每次点击后更换新二维码时启用
         qsrand(time(NULL));
-        key=rand();
-        qDebug()<<key;
-        code->generateString(QString::number(key));
-        code->show();
-        code->setVisible(true);
-        this->resize(400,150);
-        sql->insertKey(key);
+        mKey=rand();
+        qDebug()<<mKey;
+        mCode->generateString(QString::number(mKey));
+        mCode->show();
+        mCode->setVisible(true);
+        //this->resize(400,150);
+        mSql->insertKey(mKey);
         QTimer::singleShot(1000,this,SLOT(sendSearchSignals()));
     }
 #endif
@@ -118,7 +116,7 @@ void login::on_PushButton_Qrcode_clicked()//二维码按钮
 
 void login::sendSearchSignals()//二维码确认
 {
-    if(sql->searchKey(userName,key))
+    if(mSql->searchKey(mUserName,mKey))
     {
         this->accept();
     }

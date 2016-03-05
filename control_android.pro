@@ -29,7 +29,7 @@ win32 {
 HEADERS +=qrcode/qrcodegenerate.h
 SOURCES +=qrcode/qrcodegenerate.cpp
 }
-win32:LIBS +=-LD:/sourcetreedown/chinagit/VenipunctureMobileClient/lib64 -lqrcodelib
+win32:LIBS +=-LD:\sourceTreeDown\GITHUB\MxControler\lib64 -lqrcodelib
 
 FORMS    += \
     login.ui \
