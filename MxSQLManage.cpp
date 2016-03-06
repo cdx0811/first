@@ -28,13 +28,13 @@ bool sqlite::checkingUP(QWidget* parent,QString username, QString password)
             }
             else
             {
-                QMessageBox::critical(parent,"error","password wrong");
+                QMessageBox::critical(parent,QString::fromLocal8Bit("错误"),QString::fromLocal8Bit("密码错误"));
                 return false;
             }
         }
         else
         {
-            QMessageBox::critical(parent,"error","userID is wrong");
+            QMessageBox::critical(parent,QString::fromLocal8Bit("错误"),QString::fromLocal8Bit("用户名不存在"));
             return false;
         }
     }
@@ -92,7 +92,12 @@ sqlite::sqlite(QWidget *parent):QObject(parent)
     //    Database.setPort();
     //    Database.setUserName();
     //    Database.setPassword();
-    mDataBase.setDatabaseName("remotecontrol.db"); //数据库名
+#ifdef Q_OS_ANDROID
+    mDataBase.setDatabaseName("assets:/remotecontrol.db"); //数据库名
+#else
+    mDataBase.setDatabaseName("remotecontrol");
+
+#endif
     if(mDataBase.open())
     {
         qDebug()<<"database is opened";

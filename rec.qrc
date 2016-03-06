@@ -11,5 +11,6 @@
         <file>image/桌面.png</file>
         <file>image/最大最小.jpg</file>
         <file>image/login.png</file>
+        <file>sqlite/remotecontrol.db</file>
     </qresource>
 </RCC>

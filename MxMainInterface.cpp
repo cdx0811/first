@@ -39,7 +39,7 @@ void Widget::init()//初始化
     ui->pushButton_qrlogin->hide();
     pal.setBrush(QPalette::Window,QBrush(pixmap.scaled(this->size())));
 #else
-    pal.setBrush(QPalette::Window,QBrush(pixmap.scaled(loginDialog.getScreenSize()));
+    pal.setBrush(QPalette::Window,QBrush(pixmap.scaled(loginDialog.getScreenSize())));
 #endif
     setPalette(pal);
     //----------------------------------------------
@@ -72,7 +72,7 @@ void Widget::readData()//读取信息
 
 void Widget::on_pushButton_restart_clicked() //重启按钮
 {
-    QMessageBox::information(this,"infor","restart information has been seed");
+    QMessageBox::information(this,QString::fromLocal8Bit("信息"),QString::fromLocal8Bit("远程电脑已重启"));
     writeMessage(CP_ServerVci);
 }
 
@@ -108,14 +108,42 @@ void Widget::myConnectToHost(QString str)//连接到host
     }
     else
     {
-        QMessageBox::critical(mDialog,"errror","cann't be empty");
+        QMessageBox::critical(mDialog,QString::fromLocal8Bit("错误"),QString::fromLocal8Bit("IP地址不能为空"));
     }
 
 }
 
 void Widget::qAbstractError(QAbstractSocket::SocketError error)//错误信息
 {
-    QMessageBox::critical(this,"error",tr("connect fail,error code is %1").arg(error));
+    QString err;
+    switch (error)
+    {
+    case 0:
+    {
+        err=tr("远程不存在或被拒绝连接");
+        break;
+    }
+    case 1:
+    {
+        err=tr("远程关闭了连接");
+        break;
+    }
+    case 2:
+    {
+        err=tr("IP地址不存在");
+        break;
+    }
+    case 5:
+    {
+        err=tr("连接超时，请检查网络");
+        break;
+    }
+
+    default:
+        break;
+    }
+    QMessageBox::critical(this,QString::fromLocal8Bit("错误"),QString::fromLocal8Bit("连接出错，错误代码为 %1").arg(error));
+    disconnect(mSocket,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(qAbstractError(QAbstractSocket::SocketError)));
     disconnectFromRemote();
 
 }
@@ -123,7 +151,7 @@ void Widget::qAbstractError(QAbstractSocket::SocketError error)//错误信息
 void Widget::whenConnected()//connecttohost成功后
 {
     mDialog->hide();
-    ui->label_information->setText(tr("connecting %1").arg(mSocket->peerAddress().toString()));
+    ui->label_information->setText(QString::fromLocal8Bit("已连接到 %1").arg(mSocket->peerAddress().toString()));
     ui->pushButton_talk->setEnabled(true);
     ui->pushButton_restart->setEnabled(true);
     ui->pushButton_xz->setEnabled(true);
@@ -165,11 +193,11 @@ void Widget::on_pushButton_IE_clicked()
     qDebug()<<"i"<<i;
     if(i==1)
     {
-        QMessageBox::information(this,"OK","REMOTE EXPLORER.EXE HAS BEEING CLOSE");
+        QMessageBox::information(this,QString::fromLocal8Bit("信息"),QString::fromLocal8Bit("远程explore.exe已关闭"));
     }
     else
     {
-        QMessageBox::information(this,"OK","OPEN explorer.exe");
+        QMessageBox::information(this,QString::fromLocal8Bit("信息"),QString::fromLocal8Bit("远程explore.exe已打开"));
     }
 
 }
@@ -177,11 +205,12 @@ void Widget::on_pushButton_IE_clicked()
 void Widget::on_pushButton_xz_clicked()//分辨率和旋转
 {
     QDialog* dia=new QDialog(this);
+    dia->setFixedSize(250,200);
     mCheckBox=new QCheckBox(dia);
-    mCheckBox->setText("shuping");
+    mCheckBox->setText(QString::fromLocal8Bit("横屏"));
     QVBoxLayout* hbl=new QVBoxLayout(dia);
-    hbl->addWidget(mCheckBox);
-    QPushButton* button=new QPushButton("setfenbianlv",dia);
+    hbl->addWidget(mCheckBox,0,Qt::AlignHCenter);
+    QPushButton* button=new QPushButton(QString::fromLocal8Bit("调整分辨率"),dia);
     hbl->addWidget(button);
     dia->setLayout(hbl);
     dia->show();
@@ -201,13 +230,13 @@ void Widget::on_pushButton_talk_clicked() //远程状态设置按钮
 {
     mWindowStateDialog=new QDialog(this);
     mWindowStateDialog->setFixedSize(300,200);
-    QLabel* label_mini=new QLabel("minimize");
+    QLabel* label_mini=new QLabel(QString::fromLocal8Bit("最小化"));
     QRadioButton* mini=new QRadioButton;
 
-    QLabel* label_max=new QLabel("maxmize");
+    QLabel* label_max=new QLabel(QString::fromLocal8Bit("最大化"));
     QRadioButton* max=new QRadioButton;
 
-    QLabel* label_full=new QLabel("fullscreen");
+    QLabel* label_full=new QLabel(QString::fromLocal8Bit("全屏"));
     QRadioButton* full=new QRadioButton;
 
     QHBoxLayout* hmini=new QHBoxLayout;
@@ -224,7 +253,7 @@ void Widget::on_pushButton_talk_clicked() //远程状态设置按钮
     all->addLayout(hmax);
     all->addLayout(hfull);
 
-    QPushButton* ok=new QPushButton("ok");
+    QPushButton* ok=new QPushButton(QString::fromLocal8Bit("确定"));
     QVBoxLayout* vbl=new QVBoxLayout;
     vbl->addLayout(all);
     vbl->addWidget(ok);

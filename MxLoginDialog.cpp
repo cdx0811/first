@@ -32,16 +32,19 @@ login::login(QWidget *parent) :
     hbl->addLayout(ui->verticalLayout);
     hbl->addWidget(mCode);
     this->setLayout(hbl);
-    mCode->setGeometry(250,0,150,150);
-    mCode->setFixedSize(150,150);
+    int wid=this->size().width();
+    qDebug()<<wid;
+    mCode->setGeometry(wid/4,0,wid/2,wid/2);
+    //mCode->setFixedSize(200,200);
     mCode->setVisible(false);
     mCode->hide();
-    this->resize(500,300);
+    ui->verticalLayout_2->setAlignment(ui->pushButton_erweima,Qt::AlignHCenter);
+    ui->pushButton_erweima->setMaximumWidth(150);
 #else
     ui->pushButton_ok->setMinimumHeight(100);
     ui->pushButton_cancel->setMinimumHeight(100);
     ui->pushButton_erweima->hide();
-    this->setGeometry(0,0,screenWeight,screenHeight);
+    this->resize(mScreenSize);
 
 #endif
 
@@ -68,7 +71,7 @@ void login::on_pushButton_ok_clicked() //确定按钮
     }
     else
     {
-        QMessageBox::critical(this,"error","cann't be empty");
+        QMessageBox::critical(this,QString::fromLocal8Bit("错误"),QString::fromLocal8Bit("用户名和密码不能为空"));
     }
 }
 
